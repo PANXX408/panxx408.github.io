@@ -1,0 +1,19 @@
+name: "Yay internet!"
+header-includes: 
+  \usepackage{graphicx}
+  \usepackage{float}
+output_dir: "."
+navbar:
+  title: "Home"
+  right:
+    - text: "About"
+      href: about.html
+    - icon: fa-envelope fa-lg
+      href: mailto:<panxx408@umn.edu>
+    - icon: fa-github fa-lg
+      href: http://github.com/PANXX408/
+    - icon: fa-brands fa-linkedin
+      href: https://www.linkedin.com/in/mingming-pan-6480a41b8/
+output:  
+   html_document:
+    theme: flatly
