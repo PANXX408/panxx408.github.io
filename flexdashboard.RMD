@@ -1,5 +1,5 @@
 ---
-title: "COVID-19 Global Trends"
+title: "Instacart Orders In 2017"
 author: "Mingming Pan"
 output: 
   flexdashboard::flex_dashboard:
@@ -14,65 +14,87 @@ library(gt)
 library(paletteer)
 library(plotly)
 library(flexdashboard)
-
-#Working directory for .RMD
-knitr::opts_knit$set(echo = TRUE,
-                     root.dir = rprojroot::find_rstudio_root_file())
-
-#Controlling figure output in markdown
-knitr::opts_chunk$set(
-#  fig.height =   
-  fig.width = 6,
-#  fig.asp = .5,
-  out.width = "90%",
-#  out.height = 
- fig.align  = "center",
-  cache = FALSE,
-  eval  = TRUE,
-  echo  = TRUE,
-  warning = FALSE
-)
-
-#My Colours (from viridis)
-my_purple <- "#440154FF"
-my_yellow <- "#FDE725FF"
-
-#Set Theme for ggplot2
-theme_set(theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom"))
-
-#Set Scientific notation output and decimal places for knitr
-options(scipen = 999)
-options(digits = 4)
-options(dplyr.summarise.inform = FALSE)
 ```
 
 
 ```{r data_read, include = FALSE}
-
+#read data
+instacart_df <- read_csv("./data/instacart.csv")
 ```
 
-Column {data-width=650}
+
 -----------------------------------------------------------------------
 
 ### Chart A
 
-```{r}
-data(mtcars)
-hist(mtcars$mpg)
+
+```{r, warning=FALSE, message=FALSE}
+#ggplot 2 visualization of the top 6 aisles in the the top 6 departments by items purchased.
+instacart_plot1 <- 
+  instacart_df %>% 
+  filter(department_id %in% c("4","16","19","7","1","13")) %>%
+  group_by(department, aisle) %>%
+  summarise(N = n()) %>%
+  arrange(department, desc(N)) %>%
+  group_by(department) %>%
+  slice(1:6) %>%
+  ggplot(aes(x = N, y = fct_reorder(aisle, N), fill = department)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~department, scales = "free_y", ncol = 1) +
+  theme(legend.position = "bottom") +
+  labs(
+    x = "Number of Items Purchased",
+    y = "Name of Aisles",
+    title = "The Top 6 Aisles in the Top 6 Departments by Items Purchased")
+
+#ggplotly
+ggplotly(instacart_plot1)
 ```
 
-Column {data-width=350}
+
+
 -----------------------------------------------------------------------
 
 ### Chart B
 
 ```{r}
-hist(mtcars$cyl)
+#ggplot 2 which displays the number of orders (of all products) per aisle for top 20 aisle by the number of orders.
+instacart_plot2 <- 
+  instacart_df %>% 
+  distinct(order_id,aisle)  %>%
+  group_by(aisle) %>%
+  summarise(N = n()) %>%
+  slice(1:20) %>%
+  ggplot(aes(x = N, y = fct_reorder(aisle, N), fill = aisle)) +
+  geom_bar(stat = "identity") + 
+  theme(legend.position = "bottom") +
+  labs(
+    x = "Number of Orders",
+    y = "Aisle Name",
+    title = "The Number of Orders in  Top 20 Aisles")
+#ggplotly
+ggplotly(instacart_plot2)
 ```
 
 ### Chart C
 
-```{r}
-hist(mtcars$disp)
+```{r, message=FALSE}
+instacart_plot3 <-
+  instacart_df %>% 
+  filter(aisle_id %in% c("83","24","123","120","21")) %>%
+  group_by(aisle, product_name) %>%
+  summarise(N = n()) %>%
+  arrange(aisle, desc(N)) %>%
+  group_by(aisle)  %>%
+  slice(1:5) %>%
+  ggplot(aes(x = N, y = fct_reorder(product_name, N), fill = aisle)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~aisle, scales = "free_y", ncol = 1) +
+  theme(legend.position = "bottom") +
+  labs(
+    x = "Number of Items Purchased",
+    y = "Name of Products",
+    title = "The Top 5 Porducts Purchased in the Top 5 Aisles")
+ggplotly(instacart_plot3)
 ```
 
