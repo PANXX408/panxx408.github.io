@@ -3,19 +3,15 @@ title: "Mingming Pan"
 ---
 
 <div style= "float : left; position : relative; top: 0px; width : 450px; height : 360px; padding-right: 24px; margin-bottom : 0px">
-![Your Photo](./path_to_photo)
+![Your Photo](./myphoto.jpg)
 
 </div>
 
 <font size = "4"> 
-*I am a M.S. Biostatistics in University of Minnesota School of Public Health. *  
+*I am a second year student of M.S. Biostatistics in University of Minnesota School of Public Health.*  
 </font>  
   
-  
-  
-<font size = "4">
-*Paragraph 2*  
-</font>
 
->"A quote" - Somebody
+
+
 
