@@ -14,6 +14,14 @@ navbar:
       href: http://github.com/PANXX408/
     - icon: fa-brands fa-linkedin
       href: https://www.linkedin.com/in/mingming-pan-6480a41b8/
+    - text: "Professional Documents"
+      menu: 
+      - text: "Resume/CV"
+        href: resume.html
+    - text: "Recent Work"
+      menu:
+      - text: "Flexdashboard"
+        href: flexdashboard.html
 output:  
    html_document:
     theme: flatly

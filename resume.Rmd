@@ -1,10 +1,14 @@
 ---
-title: "resume"
+title: "Resume"
 author: "Mingming Pan"
 date: "3/29/2022"
 output: html_document
 ---
+```{r, warning=FALSE, include=FALSE}
+resume <- pdftools::pdf_render_page("./Resume_MingmingPan.pdf", page = 1)
+png::writePNG(resume, "resume.png")
+```
 
-**Resume**
-
-
+```{r, fig.align="center", out.width="70%", echo=FALSE}
+knitr::include_graphics("./resume.png")
+```
