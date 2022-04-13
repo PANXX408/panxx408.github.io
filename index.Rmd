@@ -3,7 +3,7 @@ title: "Mingming Pan"
 ---
 
 <div style= "float : left; position : relative; top: 0px; width : 450px; height : 360px; padding-right: 24px; margin-bottom : 0px">
-![Your Photo](./myphoto.jpg)
+![](./myphoto.jpg)
 
 </div>
 

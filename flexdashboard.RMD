@@ -22,7 +22,7 @@ library(flexdashboard)
 instacart_df <- read_csv("./data/instacart.csv")
 ```
 
-
+Column {data-width=650}
 -----------------------------------------------------------------------
 
 ### Chart A
@@ -52,7 +52,7 @@ ggplotly(instacart_plot1)
 ```
 
 
-
+Column {data-width=350}
 -----------------------------------------------------------------------
 
 ### Chart B

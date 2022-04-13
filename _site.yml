@@ -22,6 +22,8 @@ navbar:
       menu:
       - text: "Flexdashboard"
         href: flexdashboard.html
+      - text: "Spatial Dashboard"
+        href: spatialdashboard.html
 output:  
    html_document:
     theme: flatly
