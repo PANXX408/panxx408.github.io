@@ -1,10 +1,11 @@
 ---
-title: "Spatial_Dashboard"
+title: "Spatial Mapping of Hennepin, MN"
 author: "Mingming Pan"
-date: "4/12/2022"
-output: html_document
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
 ---
-
 ```{r set up, include=FALSE, warning=FALSE}
 library(sf)
 library(ggmap)
@@ -12,13 +13,25 @@ library(tmap)
 library(tidycensus)
 library(leaflet)
 library(osmdata)
+library(ggridges)
 library(tigris)
 library(tidyverse)
 library(ggthemes)
+library(lubridate)
+library(gt)
+library(paletteer)
+library(plotly)
+library(flexdashboard)
+
+#Working directory for .RMD
+knitr::opts_knit$set(echo = TRUE,
+                     root.dir = rprojroot::find_rstudio_root_file())
 ```
 
-#1.2 Please create 1 leaflet of the entire state of MN which contains at least 3 Open Street Maps (osmdata) features of your choice (40pts)
-```{r}
+Column {data-width=650}
+-----------------------------------------------------------------------
+#1.2
+```{r, warning=FALSE, message=FALSE}
 #Grab the beauty, clothes, shoes and jewelry
 osm_shop_sf.df <- opq(bbox = "hennepin") %>%
              add_osm_feature(key = "shop", value = c("beauty", "clothes", "shoes", "jewelry")) %>%
@@ -30,15 +43,9 @@ shop_points.df <- osm_shop_sf.df$osm_points %>%
   filter(!is.na(shop)) %>% #only retain 'valid' tags
   dplyr::select(osm_id, name, shop, opening_hours, phone, website, geometry) %>%
   mutate(shop = str_to_title(shop) %>% as_factor())
-
-#Check it out (minus geometry for display)
-shop_points.df %>%
-  as_tibble() %>%
-  dplyr::select(-geometry) #%>%
-  #gt_preview()
 ```
 
-```{r}
+```{r, message=FALSE}
 #Get the bounding box and county outline
 mn.box           <- osmdata::getbb("minnesota")
 hennepin.box     <- osmdata::getbb("hennepin")
@@ -69,26 +76,7 @@ hennepin_base.gg <- ggmap(mn_base.map) +
   )
     
 #Display base map
-hennepin_base.gg
-```
-
-```{r}
-#Let's add it to a hennepin_base.gg
-hennepin_base.gg +
-  geom_sf(data = shop_points.df,
-          aes(colour = shop),
-          inherit.aes = FALSE,
-          alpha = 0.8, shape = 16) +
-  labs(title = "Hennepin County, MN OSM Features") + 
-  scale_colour_viridis_d("Store") +
-  theme_map() +
-  theme(
-    plot.title   = element_text(size  = 16,
-                                hjust = 0.5),
-    legend.text  = element_text(size = 16),
-    legend.title = element_text(size = 16),
-    legend.position = "right"
-  )
+#hennepin_base.gg
 ```
 
 ```{r}
@@ -102,23 +90,7 @@ n_types    <- length(shop_types)
 #Initialize our colour pallete (discrete in this case)
 my_pallete <- colorFactor(viridis_pal(option = "D")(n_types), domain = shop_types)
 
-#Call our leaflet
-leaflet(data = shop_points.df) %>%
-  addProviderTiles('CartoDB.Positron') %>% 
-  addCircleMarkers(
-    color   = ~my_pallete(shop_types),
-    opacity = 0.4,
-    weight  = 2, #outline strength
-    radius  = 4 #size of circle
-  ) %>%
-  addLegend(
-    title    = "Store Type",
-    position = "bottomright",
-    colors   = viridis_pal(option = "D")(n_types),
-    labels   = shop_types 
-  )
-```
-```{r}
+
 #Need html tools to get our labels to render appropriately
 library(htmltools, quietly = TRUE)
 
@@ -157,18 +129,14 @@ leaflet(data = shop_label.df) %>%
 
 ```
 
-#1.3 Please create 1 ggplotly of Hennepin County using sf, ggmap, tidycensus, ggplot, and plotly; which describes a Census Blockgroup level 2020 American Community Survey (ACS) esimate/feature of your choosing (25 pts)
-```{r}
-#Read in the shape file
-mn.df <- st_read("./data/USA_Counties/USA_Counties.shp", quiet = TRUE) %>%
-  janitor::clean_names() %>%
-  filter(state_name == "Minnesota")
-```
+Column {data-width=350}
+-----------------------------------------------------------------------
+#1.3 
 
-```{r}
+```{r, message=FALSE}
 #Install API key
 #census_api_key("87a8e368974c8a16a0b035786499e73095bd370e", install = TRUE)
-
+#register_google(key = "AIzaSyCbp0epXaVuSX2to4_pRnVQiMD-xl2Haq8")
 #Save the cache so you don't need to call the same API request over and over
 options(tigris_use_cache = TRUE)
 
@@ -205,7 +173,7 @@ household.gg <- ggplot() +
           aes(fill = estimate, text = text_label),
           colour = "black", size = 0.1) + 
   labs(title = "Hennepin County, MN 2020 ACS Household Income") + 
-  scale_fill_viridis_c("Household Income") +
+  scale_fill_viridis_c("Household Income", labels = scales::dollar) +
   theme_map() +
   theme(
     plot.title   = element_text(size  = 16,
@@ -225,30 +193,44 @@ ggplotly(household.gg,
 
 ```
 
-```{r}
 
 
+#1.4
+```{r, warning=FALSE, message=FALSE}
+#Grab the pet, pet_grooming,pet_supply, pet_food
+osm_pet_sf.df <- opq(bbox = "hennepin") %>%
+             add_osm_feature(key = "shop", value = c("pet", "pet_grooming", "pet_supply", "pet_food")) %>%
+  osmdata_sf()
+
+#Extract the relevant sf data frame
+pet_points.df <- osm_pet_sf.df$osm_points %>% 
+  janitor::clean_names() %>%
+  filter(!is.na(shop)) %>% #only retain 'valid' tags
+  dplyr::select(osm_id, name, shop, opening_hours, phone, website, geometry) %>%
+  mutate(shop = str_to_title(shop) %>% as_factor())
+
+
+#Let's add it to a hennepin_base.gg
+hennepin_base.gg +
+  geom_sf(data = pet_points.df,
+          aes(colour = shop),
+          inherit.aes = FALSE,
+          alpha = 0.8, shape = 16) +
+  labs(title = "Hennepin County, MN Pet Shop OSM Features") + 
+  scale_colour_viridis_d("Store") +
+  theme_map() +
+  theme(
+    plot.title   = element_text(size  = 16,
+                                hjust = 0.5),
+    legend.text  = element_text(size = 16),
+    legend.title = element_text(size = 16),
+    legend.position = "right"
+  )
 ```
 
-```{r}
 
 
-```
 
-```{r}
-
-
-```
-
-```{r}
-
-
-```
-
-```{r}
-
-
-```
 
 
 

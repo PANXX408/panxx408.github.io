@@ -79,6 +79,7 @@ ggplotly(instacart_plot2)
 ### Chart C
 
 ```{r, message=FALSE}
+#The Top 5 Porducts Purchased in the Top 5 Aisles
 instacart_plot3 <-
   instacart_df %>% 
   filter(aisle_id %in% c("83","24","123","120","21")) %>%
